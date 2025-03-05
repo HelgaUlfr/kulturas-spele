@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latvijas Kultūras Zvaigzne</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+      background-size: 400% 400%;
+      animation: gradientBackground 15s ease infinite;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 0 10px;
+      color: #333;
+    }
+
+    @keyframes gradientBackground {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    header, footer {
+      width: 100%;
+      text-align: center;
+    }
+
+    header h1, footer p {
+      padding: 0;
+    }
+
+    .game-container {
+      background-color: #fff;
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      margin: 20px 0;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 900;
+      color: #ffb347; /* Pastel orange */
+      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* Black border around letters */
+      margin-bottom: 20px;
+      display: inline-block;
+      padding: 5px;
+    }
+
+    .card {
+      background-color: #f1c40f;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input {
+      padding: 12px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 90%;
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #d35400;
+    }
+
+    #timer {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ff3333;
+      margin-top: 10px;
+    }
+
+    #result {
+      font-style: italic;
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .correct {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .incorrect {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #2ecc71;
+      color: white;
+      font-size: 18px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #1e8449;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+    }
+
+    #scoreboard {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #summary {
+      margin-top: 20px;
+      font-size: 18px;
+      text-align: left;
+    }
+
+    .result-item.correct {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      list-style-type: none;
+    }
+
+    .result-item.incorrect {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      list-style-type: none;
+    }
+
+    #question-tracker {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Latvijas Kultūras Zvaigzne</h1>
+  </header>
+  <div class="game-container">
+    <div id="question-tracker" class="hidden">1-10</div>
+    <p id="timer" class="hidden"></p>
+    
+    <div class="card">
+      <p id="question">Nospied "Sākt spēli", lai sāktu!</p>
+    </div>
+    
+    <input type="text" id="userAnswer" class="hidden" placeholder="Ievadi atbildi...">
+    <p id="result" class="hidden"></p>
+    
+    <button id="startGame">Sākt spēli</button>
+    
+    <div id="scoreboard">
+      <h2>Punkti: <span id="score">0</span></h2>
+    </div>
+    
+    <div id="summary" class="hidden">
+      <h2>Rezultāti:</h2>
+      <div id="correctAnswers"></div>
+      <div id="wrongAnswers"></div>
+      <button id="restartButton" class="hidden">Atpakaļ sākumā</button>
+    </div>
+    <div id="results-container" class="hidden">
+      <h2>Results:</h2>
+      <ul id="results-list"></ul>
+    </div>
+  </div>
+  <footer>
+    <p>&copy; 2025 Latvijas Kultūras Zvaigzne</p>
+  </footer>
+
+  <script type="module">
+    import questions from './questions.js';
+
+    let currentCard = null;
+    let score = 0;
+    let questionIndex = 0;
+    let correctAnswers = [];
+    let wrongAnswers = [];
+    const timeLimit = 60; // 60 sekundes laika limits
+    let timeRemaining = timeLimit;
+    let timerInterval;
+
+    const questionElem = document.getElementById("question");
+    const userAnswerElem = document.getElementById("userAnswer");
+    const timerElem = document.getElementById("timer");
+    const resultElem = document.getElementById("result");
+    const startGameButton = document.getElementById("startGame");
+    const scoreElem = document.getElementById("score");
+    const summaryElem = document.getElementById("summary");
+    const correctAnswersElem = document.getElementById("correctAnswers");
+    const wrongAnswersElem = document.getElementById("wrongAnswers");
+    const restartButton = document.getElementById("restartButton");
+    const questionTrackerElem = document.getElementById("question-tracker");
+
+    function normalizeString(str) {
+      return str.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+                .replace(/\s{2,}/g, " ")
+                .trim()
+                .toLowerCase();
+    }
+
+    function startTimer() {
+      timeRemaining = timeLimit;
+      timerElem.textContent = "Laiks: " + timeRemaining + " s";
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        timerElem.textContent = "Laiks: " + timeRemaining + " s";
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          timeUp();
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+    }
+
+    function timeUp() {
+      userAnswerElem.disabled = true;
+      resultElem.classList.remove("hidden");
+      resultElem.textContent = "Laiks beidzās! Pareizā atbilde: " + currentCard.answer;
+      setTimeout(nextQuestion, 5000); // Automātiski izvelk jaunu pēc 5 sekundēm
+    }
+
+    function nextQuestion() {
+      questionIndex++;
+      if (questionIndex >= 10) {
+        endGame();
+      } else {
+        drawNewCard();
+      }
+    }
+
+    function drawNewCard() {
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      currentCard = questions.splice(randomIndex, 1)[0]; // Remove the selected question from the array
+      questionElem.textContent = currentCard.question;
+      resultElem.classList.add("hidden");
+      userAnswerElem.value = "";
+      userAnswerElem.disabled = false;
+      userAnswerElem.classList.remove("hidden");
+      timerElem.classList.remove("hidden");
+      questionTrackerElem.textContent = `${questionIndex + 1}-10`;
+      questionTrackerElem.classList.remove("hidden");
+      startTimer();
+    }
+
+    function endGame() {
+      const resultsContainer = document.getElementById('results-container');
+      resultsContainer.classList.remove('hidden');
+      const resultsList = document.getElementById('results-list');
+      resultsList.innerHTML = '';
+      correctAnswers.forEach((answer, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}-10: ${answer.question} (Laiks: ${answer.time} s)`;
+        li.classList.add('result-item', 'correct');
+        resultsList.appendChild(li);
+      });
+      wrongAnswers.forEach((answer, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}-10: ${answer.question} (Laiks: ${answer.time} s)`;
+        li.classList.add('result-item', 'incorrect');
+        resultsList.appendChild(li);
+      });
+    }
+
+    startGameButton.addEventListener("click", () => {
+      startGameButton.classList.add("hidden"); // Noslēpj sākuma pogu
+      drawNewCard();
+    });
+
+    restartButton.addEventListener("click", () => {
+      score = 0;
+      questionIndex = 0;
+      correctAnswers = [];
+      wrongAnswers = [];
+      summaryElem.classList.add("hidden");
+      startGameButton.classList.remove("hidden");
+      scoreElem.textContent = score;
+      questionTrackerElem.classList.add("hidden");
+    });
+
+    userAnswerElem.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        submitAnswer();
+      }
+    });
+
+    function submitAnswer() {
+      stopTimer();
+      const userAnswer = normalizeString(userAnswerElem.value);
+      const correctAnswer = normalizeString(currentCard.answer);
+      if (userAnswer === correctAnswer) {
+        score += getPointsForTime(timeRemaining);
+        correctAnswers.push({ question: currentCard.question, time: timeLimit - timeRemaining });
+        scoreElem.textContent = score;
+        resultElem.textContent = "Pareizi!";
+        resultElem.classList.add("correct");
+        resultElem.classList.remove("incorrect");
+      } else {
+        wrongAnswers.push({ question: currentCard.question, time: timeLimit - timeRemaining });
+        resultElem.textContent = "Nepareizi! Pareizā atbilde: " + currentCard.answer;
+        resultElem.classList.add("incorrect");
+        resultElem.classList.remove("correct");
+      }
+      resultElem.classList.remove("hidden");
+      userAnswerElem.disabled = true;
+
+      setTimeout(nextQuestion, 5000); // Automātiski izvelk jaunu pēc 5 sekundēm
+    }
+
+    function getPointsForTime(timeRemaining) {
+      if (timeRemaining > 30) {
+        return 50;
+      } else if (timeRemaining > 20) {
+        return 30;
+      } else if (timeRemaining > 10) {
+        return 10;
+      } else {
+        return 0;
+      }
+    }
+  </script>
+</body>
+</html>
