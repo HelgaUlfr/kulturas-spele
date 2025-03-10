@@ -183,6 +183,7 @@
       font-weight: bold;
       color: #333;
     }
+    
   </style>
 </head>
 <body>
@@ -197,7 +198,7 @@
       <p id="question">Nospied "Sākt spēli", lai sāktu!</p>
     </div>
     
-    <input type="text" id="userAnswer" class="hidden" placeholder="Ievadi atbildi...">
+    <input type="text" id="userAnswer" autocomplete="off" class="hidden" placeholder="Ievadiet atbildi...">
     <p id="result" class="hidden"></p>
     
     <button id="startGame">Sākt spēli</button>
@@ -210,7 +211,7 @@
       <h2>Rezultāti:</h2>
       <div id="correctAnswers"></div>
       <div id="wrongAnswers"></div>
-      <button id="restartButton" class="hidden">Atpakaļ sākumā</button>
+      <button id="restartButton" class="hidden">Atpakaļ uz sākumu</button>
     </div>
     <div id="results-container" class="hidden">
       <h2>Results:</h2>
@@ -277,27 +278,27 @@
     }
 
     function nextQuestion() {
-      questionIndex++;
-      if (questionIndex >= 10) {
-        endGame();
-      } else {
-        drawNewCard();
-      }
+    questionIndex++;
+    if (questionIndex >= 20) {
+      endGame();
+    } else {
+      drawNewCard();
     }
+  }
 
-    function drawNewCard() {
-      const randomIndex = Math.floor(Math.random() * questions.length);
-      currentCard = questions.splice(randomIndex, 1)[0]; // Remove the selected question from the array
-      questionElem.textContent = currentCard.question;
-      resultElem.classList.add("hidden");
-      userAnswerElem.value = "";
-      userAnswerElem.disabled = false;
-      userAnswerElem.classList.remove("hidden");
-      timerElem.classList.remove("hidden");
-      questionTrackerElem.textContent = `${questionIndex + 1}-10`;
-      questionTrackerElem.classList.remove("hidden");
-      startTimer();
-    }
+  function drawNewCard() {
+    const randomIndex = Math.floor(Math.random() * questions.length);
+    currentCard = questions.splice(randomIndex, 1)[0];
+    questionElem.textContent = currentCard.question;
+    resultElem.classList.add("hidden");
+    userAnswerElem.value = "";
+    userAnswerElem.disabled = false;
+    userAnswerElem.classList.remove("hidden");
+    timerElem.classList.remove("hidden");
+    questionTrackerElem.textContent = `${questionIndex + 1}-20`;
+    questionTrackerElem.classList.remove("hidden");
+    startTimer();
+  }
 
     function endGame() {
       const resultsContainer = document.getElementById('results-container');
@@ -316,6 +317,12 @@
         li.classList.add('result-item', 'incorrect');
         resultsList.appendChild(li);
       });
+      if (questionIndex < 10) {
+        const li = document.createElement('li');
+        li.textContent = `${questionIndex + 1}-10: ${currentCard.question} (Laiks: 0 s)`;
+        li.classList.add('result-item', 'incorrect');
+        resultsList.appendChild(li);
+      }
     }
 
     startGameButton.addEventListener("click", () => {
@@ -342,8 +349,9 @@
 
     function submitAnswer() {
       stopTimer();
-      const userAnswer = normalizeString(userAnswerElem.value);
-      const correctAnswer = normalizeString(currentCard.answer);
+      const userAnswer = normalizeString(userAnswerElem.value || "");
+      const correctAnswer = normalizeString(currentCard?.answer || "");
+      
       if (userAnswer === correctAnswer) {
         score += getPointsForTime(timeRemaining);
         correctAnswers.push({ question: currentCard.question, time: timeLimit - timeRemaining });
@@ -352,11 +360,12 @@
         resultElem.classList.add("correct");
         resultElem.classList.remove("incorrect");
       } else {
-        wrongAnswers.push({ question: currentCard.question, time: timeLimit - timeRemaining });
-        resultElem.textContent = "Nepareizi! Pareizā atbilde: " + currentCard.answer;
+        wrongAnswers.push({ question: currentCard?.question || "Nezināms jautājums", time: timeLimit - timeRemaining });
+        resultElem.textContent = "Nepareizi! Pareizā atbilde: " + (currentCard?.answer || "Nezināma atbilde");
         resultElem.classList.add("incorrect");
         resultElem.classList.remove("correct");
       }
+      
       resultElem.classList.remove("hidden");
       userAnswerElem.disabled = true;
 
@@ -377,3 +386,4 @@
   </script>
 </body>
 </html>
+
